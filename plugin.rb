@@ -6,6 +6,10 @@
 
 register_asset "stylesheets/expert-dialog.scss"
 
+# Register JavaScript files
+register_asset "javascripts/discourse/services/dialog.js"
+register_asset "javascripts/discourse/initializers/expert-dialog-init.js"
+
 enabled_site_setting :expert_dialog_enabled
 
 PLUGIN_NAME ||= "ExpertDialog".freeze

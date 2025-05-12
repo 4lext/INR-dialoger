@@ -2,7 +2,7 @@ import Service from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 
-export default Service.extend({
+export default class DialogService extends Service {
   async generateDialogForTopic(topicId) {
     try {
       // Track operation in browser console for debugging
@@ -24,7 +24,7 @@ export default Service.extend({
       popupAjaxError(error);
       return { success: false, error: error.message || "Unknown error" };
     }
-  },
+  }
   
   async generateTTS(topicId, postId) {
     try {
@@ -51,4 +51,4 @@ export default Service.extend({
       return { success: false, error: error.message || "Unknown error" };
     }
   }
-}); 
+} 
