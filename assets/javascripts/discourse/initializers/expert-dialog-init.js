@@ -3,14 +3,25 @@ import { withPluginApi } from "discourse/lib/plugin-api";
 export default {
   name: "expert-dialog-init",
   
-  initialize() {
+  initialize(container) {
     withPluginApi("0.8.31", api => {
+      const siteSettings = container.lookup('service:site-settings');
+      
+      // Only proceed if the feature is enabled
+      if (!siteSettings.expert_dialog_enabled) {
+        return;
+      }
+      
       // Add an icon to the topic admin dropdown
       api.addTopicAdminMenuButton({
-        icon: "discourse-sparkles",
+        icon: "magic", // Using standard Font Awesome icon
         title: "expert_dialog.generate_button",
         action: "generateExpertDialog",
-        position: "second-last-visible"
+        position: "second-last-visible",
+        // Only show for staff members
+        displayed() {
+          return api.getCurrentUser() && api.getCurrentUser().staff;
+        }
       });
       
       // Create the topic admin action
