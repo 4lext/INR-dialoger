@@ -107,6 +107,15 @@ This plugin is built using:
 - Plugin outlet system for UI integration
 - Redux-inspired state management on the server side
 
+### UI Integration Approach
+
+The plugin uses a hybrid approach for UI integration with Discourse:
+
+1. **Modern Plugin Outlets**: For the admin menu button, we use `api.renderInOutlet()` with a Glimmer component
+2. **Traditional Connectors**: For post-specific content like the audio player, we use the connector pattern
+   
+This hybrid approach ensures compatibility with Discourse 3.5+ while maintaining proper integration with different parts of the UI.
+
 ## Requirements
 
 - Discourse v3.5.0 or higher

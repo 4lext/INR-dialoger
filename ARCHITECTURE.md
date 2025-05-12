@@ -23,6 +23,10 @@ discourse-expert-dialog/
 │       │   │   ├── expert-dialog-audio.hbs
 │       │   │   ├── topic-admin-menu-button.js
 │       │   │   └── topic-admin-menu-button.hbs
+│       │   ├── connectors/
+│       │   │   └── after-post-contents/
+│       │   │       ├── expert-dialog-audio.js
+│       │   │       └── expert-dialog-audio.hbs
 │       │   ├── services/
 │       │   │   └── dialog.js
 │       │   └── initializers/
@@ -70,6 +74,7 @@ discourse-expert-dialog/
 2. **ExpertDialogAudio**: Glimmer component for audio playback
 3. **DialogService**: Service to communicate with server endpoints
 4. **ExpertDialogInit**: Initializer that registers components with plugin outlets
+5. **Connectors**: Integration points for post content and other Discourse elements
 
 ## Modern Frontend Architecture
 
@@ -78,8 +83,10 @@ The plugin uses modern Discourse 3.5+ frontend patterns:
 1. **Glimmer Components**: Using `@glimmer/component` instead of classic Ember components
 2. **Tracked Properties**: Using `@tracked` from `@glimmer/tracking` for reactivity
 3. **Decorators**: Using `@service`, `@action` decorators
-4. **Plugin Outlets**: Using `api.renderInOutlet()` instead of connectors
-5. **Modern Templates**: Using angle bracket component syntax and modifiers
+4. **Plugin Outlets**: Using `api.renderInOutlet()` for admin menu integration
+5. **Widget Decoration**: Using `api.decorateWidget()` for post content integration
+6. **Connectors**: For specific integration points like after-post-contents
+7. **Modern Templates**: Using angle bracket component syntax and modifiers
 
 Example of a modern component:
 
@@ -154,4 +161,5 @@ The plugin integrates with Discourse 3.5+ through:
 1. **Plugin Outlets**: Using `api.renderInOutlet()` to add UI elements
 2. **API Initialization**: Using `apiInitializer` with version compatibility
 3. **Model Extensions**: Using `api.modifyClass()` to extend core models
-4. **Widget Decoration**: Using `api.decorateWidget()` for post modifications 
+4. **Widget Decoration**: Using `api.decorateWidget()` for post modifications
+5. **Connectors**: Traditional connector pattern for specific integration points 

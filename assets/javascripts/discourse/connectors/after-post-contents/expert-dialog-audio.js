@@ -1,3 +1,5 @@
+import { setOwner } from "@ember/application";
+
 export default {
   setupComponent(attrs, component) {
     const { post } = attrs;
@@ -8,6 +10,9 @@ export default {
       component.set('topicId', post.topic_id);
       component.set('postId', post.id);
     }
+    
+    // Make sure owner is properly set for service injection
+    setOwner(component, this.getOwner(component));
   },
   
   shouldRender(args, component) {

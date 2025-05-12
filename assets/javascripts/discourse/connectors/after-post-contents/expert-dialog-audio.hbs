@@ -1,1 +1,6 @@
-{{expert-dialog-audio topicId=this.topicId postId=this.postId}} 
+{{#if (and component.post.cooked component.post.cooked.includes "Expert Analysis Dialog")}}
+  <ExpertDialogAudio 
+    @topicId={{component.post.topic_id}} 
+    @postId={{component.post.id}} 
+  />
+{{/if}} 

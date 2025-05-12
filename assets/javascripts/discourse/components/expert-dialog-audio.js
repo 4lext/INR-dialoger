@@ -2,9 +2,11 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { inject as service } from "@ember/service";
 import { action } from "@ember/object";
+import I18n from "I18n";
 
 export default class ExpertDialogAudio extends Component {
   @service dialog;
+  @service modal;
   
   @tracked isPlaying = false;
   @tracked audioUrl = null;
@@ -34,9 +36,17 @@ export default class ExpertDialogAudio extends Component {
         this.isPlaying = true;
       } else {
         this.error = result.error || "Unknown error generating audio";
+        this.modal.show({
+          title: I18n.t("expert_dialog.error_title"),
+          message: this.error
+        });
       }
     } catch (err) {
       this.error = err.message || "Error generating audio";
+      this.modal.show({
+        title: I18n.t("expert_dialog.error_title"),
+        message: this.error
+      });
     } finally {
       this.loading = false;
     }
@@ -50,7 +60,13 @@ export default class ExpertDialogAudio extends Component {
   @action
   downloadAudio() {
     if (this.audioUrl) {
-      window.open(this.audioUrl, "_blank");
+      // Create a temporary anchor element
+      const a = document.createElement("a");
+      a.href = this.audioUrl;
+      a.download = `expert-dialog-${this.args.postId}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   }
 } 

@@ -31,15 +31,7 @@ export default apiInitializer("0.11.1", api => {
     }
   });
   
-  // Register audio component for post content
-  api.decorateWidget("post-contents:after", helper => {
-    const post = helper.getModel();
-    if (post && post.cooked && post.cooked.includes("Expert Analysis Dialog")) {
-      return helper.attach("expert-dialog-audio", {
-        topicId: post.topic_id,
-        postId: post.id
-      });
-    }
-    return null;
-  });
+  // We're using the after-post-contents connector for the audio component,
+  // so we don't need to use the widget decoration approach.
+  // This avoids duplication of the audio component in posts.
 });
