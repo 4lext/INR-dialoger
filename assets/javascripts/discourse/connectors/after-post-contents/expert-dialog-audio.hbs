@@ -1,6 +1,6 @@
-{{#if (and component.post.cooked component.post.cooked.includes "Expert Analysis Dialog")}}
+{{#if this.shouldRender}}
   <ExpertDialogAudio 
-    @topicId={{component.post.topic_id}} 
-    @postId={{component.post.id}} 
+    @topicId={{this.args.outletArgs.post.topic_id}} 
+    @postId={{this.args.outletArgs.post.id}} 
   />
 {{/if}} 

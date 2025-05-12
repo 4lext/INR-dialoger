@@ -31,7 +31,6 @@ export default apiInitializer("0.11.1", api => {
     }
   });
   
-  // We're using the after-post-contents connector for the audio component,
-  // so we don't need to use the widget decoration approach.
-  // This avoids duplication of the audio component in posts.
+  // We're using the after-post-contents connector for the audio component
+  // which now uses the modern Ember patterns in Discourse 3.5
 });

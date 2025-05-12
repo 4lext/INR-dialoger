@@ -1,21 +1,18 @@
+import Component from "@glimmer/component";
 import { setOwner } from "@ember/application";
+import { inject as service } from "@ember/service";
 
-export default {
-  setupComponent(attrs, component) {
-    const { post } = attrs;
-    
-    if (post) {
-      // Check if this post contains an expert dialog
-      component.set('hasExpertDialog', post.cooked.includes('Expert Analysis Dialog'));
-      component.set('topicId', post.topic_id);
-      component.set('postId', post.id);
-    }
-    
-    // Make sure owner is properly set for service injection
-    setOwner(component, this.getOwner(component));
-  },
+export default class ExpertDialogAudioConnector extends Component {
+  @service siteSettings;
   
-  shouldRender(args, component) {
-    return component.hasExpertDialog && component.siteSettings.expert_dialog_enable_tts;
+  get shouldRender() {
+    const { post } = this.args.outletArgs;
+    return post?.cooked?.includes("Expert Analysis Dialog") && 
+           this.siteSettings.expert_dialog_enable_tts;
   }
-}; 
+  
+  constructor() {
+    super(...arguments);
+    setOwner(this, this.args.owner);
+  }
+} 
