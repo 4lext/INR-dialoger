@@ -1,6 +1,6 @@
 # Discourse Expert Dialog Plugin - Architecture
 
-This document describes the architecture of the Discourse Expert Dialog Plugin.
+This document describes the architecture of the Discourse Expert Dialog Plugin, which is compatible with Discourse 3.5+ and uses the ember-cli approach.
 
 ## Overview
 
@@ -20,20 +20,11 @@ discourse-expert-dialog/
 │       ├── discourse/
 │       │   ├── components/
 │       │   │   ├── expert-dialog-audio.js
-│       │   │   └── expert-dialog-button.js
-│       │   ├── connectors/
-│       │   │   ├── topic-admin-menu-buttons/
-│       │   │   │   ├── generate-expert-dialog.js
-│       │   │   │   └── generate-expert-dialog.hbs
-│       │   │   └── after-post-contents/
-│       │   │       ├── expert-dialog-audio.js
-│       │   │       └── expert-dialog-audio.hbs
+│       │   │   ├── expert-dialog-audio.hbs
+│       │   │   ├── topic-admin-menu-button.js
+│       │   │   └── topic-admin-menu-button.hbs
 │       │   ├── services/
 │       │   │   └── dialog.js
-│       │   ├── templates/
-│       │   │   └── components/
-│       │   │       ├── expert-dialog-audio.hbs
-│       │   │       └── expert-dialog-button.hbs
 │       │   └── initializers/
 │       │       └── expert-dialog-init.js
 │   └── stylesheets/
@@ -56,8 +47,6 @@ discourse-expert-dialog/
 │       ├── dialog_formatter.rb
 │       ├── content_publisher.rb
 │       └── tts_generator.rb
-├── docs/
-│   └── components/
 ├── plugin.rb
 └── README.md
 ```
@@ -75,15 +64,45 @@ discourse-expert-dialog/
 7. **ContentPublisher**: Publishes dialogs to topics
 8. **TTSGenerator**: Generates audio for dialogs
 
-### Client-Side
+### Client-Side (ember-cli)
 
-1. **ExpertDialogButton**: Button to trigger dialog generation
-2. **ExpertDialogAudio**: Audio player for generated dialogs
-3. **Dialog Service**: Service to communicate with server endpoints
+1. **TopicAdminMenuButton**: Component that adds a button to the topic admin menu
+2. **ExpertDialogAudio**: Glimmer component for audio playback
+3. **DialogService**: Service to communicate with server endpoints
+4. **ExpertDialogInit**: Initializer that registers components with plugin outlets
+
+## Modern Frontend Architecture
+
+The plugin uses modern Discourse 3.5+ frontend patterns:
+
+1. **Glimmer Components**: Using `@glimmer/component` instead of classic Ember components
+2. **Tracked Properties**: Using `@tracked` from `@glimmer/tracking` for reactivity
+3. **Decorators**: Using `@service`, `@action` decorators
+4. **Plugin Outlets**: Using `api.renderInOutlet()` instead of connectors
+5. **Modern Templates**: Using angle bracket component syntax and modifiers
+
+Example of a modern component:
+
+```javascript
+import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
+import { inject as service } from "@ember/service";
+import { action } from "@ember/object";
+
+export default class ExpertDialogAudio extends Component {
+  @service dialog;
+  @tracked isPlaying = false;
+  
+  @action
+  toggleAudio() {
+    this.isPlaying = !this.isPlaying;
+  }
+}
+```
 
 ## Data Flow
 
-1. User clicks "Generate Expert Dialog" button
+1. User clicks "Generate Expert Dialog" button in topic admin menu
 2. Request is sent to server
 3. Server initializes state and tracks operation
 4. Content analyzer extracts key information from topic
@@ -127,3 +146,12 @@ The Text-to-Speech integration:
 3. Uses different voices for different experts
 4. Combines audio files into a single track
 5. Provides download and playback options 
+
+## Integration with Discourse 3.5+
+
+The plugin integrates with Discourse 3.5+ through:
+
+1. **Plugin Outlets**: Using `api.renderInOutlet()` to add UI elements
+2. **API Initialization**: Using `apiInitializer` with version compatibility
+3. **Model Extensions**: Using `api.modifyClass()` to extend core models
+4. **Widget Decoration**: Using `api.decorateWidget()` for post modifications 

@@ -16,8 +16,12 @@ en:
   
   expert_dialog:
     title: "Expert Dialog"
+    generate_dialog: "Generate Expert Dialog"
     generate_button: "Generate Expert Dialog"
     generate_button_title: "Create an analytical dialog between experts based on this topic"
+    confirm_title: "Generate Expert Dialog"
+    confirm_message: "This will generate an analytical dialog between IR/defense experts based on this topic's discussion. Continue?"
+    confirm_button: "Generate"
     generating: "Generating dialog..."
     success: "Dialog generated successfully!"
     error: "Error generating dialog"

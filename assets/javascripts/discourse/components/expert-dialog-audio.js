@@ -1,32 +1,56 @@
-import Component from "@ember/component";
+import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
 import { inject as service } from "@ember/service";
 import { action } from "@ember/object";
-import { tracked } from "@glimmer/tracking";
 
 export default class ExpertDialogAudio extends Component {
   @service dialog;
   
-  @tracked isGenerating = false;
+  @tracked isPlaying = false;
   @tracked audioUrl = null;
-  @tracked errorMessage = "";
+  @tracked loading = false;
+  @tracked error = null;
   
   @action
-  async generateAudio() {
-    this.isGenerating = true;
-    this.errorMessage = "";
+  async generateAndPlayAudio() {
+    if (this.audioUrl) {
+      // Audio already generated, just toggle play/pause
+      this.toggleAudio();
+      return;
+    }
+    
+    this.loading = true;
+    this.error = null;
     
     try {
-      const result = await this.dialog.generateTTS(this.topicId, this.postId);
+      const result = await this.dialog.generateTTS(
+        this.args.topicId,
+        this.args.postId
+      );
       
-      if (result.success && result.tts_result && result.tts_result.success) {
+      if (result.success) {
         this.audioUrl = result.tts_result.combined_audio;
+        // Auto-play after generation
+        this.isPlaying = true;
       } else {
-        this.errorMessage = result.error || I18n.t("expert_dialog.tts_error");
+        this.error = result.error || "Unknown error generating audio";
       }
-    } catch (error) {
-      this.errorMessage = error.message || I18n.t("expert_dialog.tts_error");
+    } catch (err) {
+      this.error = err.message || "Error generating audio";
     } finally {
-      this.isGenerating = false;
+      this.loading = false;
+    }
+  }
+  
+  @action
+  toggleAudio() {
+    this.isPlaying = !this.isPlaying;
+  }
+  
+  @action
+  downloadAudio() {
+    if (this.audioUrl) {
+      window.open(this.audioUrl, "_blank");
     }
   }
 } 

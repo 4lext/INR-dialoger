@@ -1,22 +1,33 @@
-{{#if this.audioUrl}}
+{{#if (and @topicId @postId)}}
   <div class="expert-dialog-audio">
-    <audio controls src="{{this.audioUrl}}"></audio>
-    <div class="expert-dialog-audio-download">
-      <a href="{{this.audioUrl}}" download>{{i18n "expert_dialog.download_audio"}}</a>
-    </div>
-  </div>
-{{else}}
-  <div class="expert-dialog-audio-button">
-    {{#if this.isGenerating}}
-      <div class="spinner small"></div>
+    {{#if this.audioUrl}}
+      <div class="audio-player">
+        <audio 
+          src={{this.audioUrl}} 
+          controls
+          {{on "play" (fn (mut this.isPlaying) true)}}
+          {{on "pause" (fn (mut this.isPlaying) false)}}
+        ></audio>
+        
+        <DButton
+          @class="btn-default download-audio"
+          @action={{this.downloadAudio}}
+          @icon="download"
+          @label="expert_dialog.download_audio"
+        />
+      </div>
     {{else}}
-      <button {{on "click" this.generateAudio}} class="btn btn-default">
-        {{i18n "expert_dialog.listen"}}
-      </button>
+      <DButton
+        @class="btn-default generate-audio {{if this.loading 'loading'}}"
+        @action={{this.generateAndPlayAudio}}
+        @icon={{if this.loading "spinner" "volume-up"}}
+        @label="expert_dialog.listen"
+        @disabled={{this.loading}}
+      />
+      
+      {{#if this.error}}
+        <div class="error-message">{{this.error}}</div>
+      {{/if}}
     {{/if}}
   </div>
-{{/if}}
-
-{{#if this.errorMessage}}
-  <div class="alert alert-error">{{this.errorMessage}}</div>
 {{/if}} 
