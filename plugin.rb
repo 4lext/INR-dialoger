@@ -211,4 +211,9 @@ after_initialize do
   
   # Site settings
   DiscoursePluginRegistry.serialized_current_user_fields << "can_generate_expert_dialog"
+  
+  # Register admin route
+  Discourse::Application.routes.append do
+    get '/admin/plugins/expert-dialog' => 'admin/plugins#index', constraints: StaffConstraint.new
+  end
 end 

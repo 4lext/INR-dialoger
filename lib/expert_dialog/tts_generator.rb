@@ -1,4 +1,7 @@
 require 'fileutils'
+require 'net/http'
+require 'uri'
+require 'json'
 
 module ExpertDialog
   class TTSGenerator
@@ -12,7 +15,11 @@ module ExpertDialog
       )
       
       # Initialize TTS engine configuration
+      @tts_provider = SiteSetting.expert_dialog_tts_provider
       @tts_service_url = SiteSetting.expert_dialog_tts_service_url
+      @openai_api_key = SiteSetting.expert_dialog_openai_api_key
+      @tts_model = SiteSetting.expert_dialog_tts_model
+      
       @voice_profiles = {
         "expert1" => SiteSetting.expert_dialog_tts_voice_1,
         "expert2" => SiteSetting.expert_dialog_tts_voice_2
@@ -26,8 +33,10 @@ module ExpertDialog
           return { success: false, error: "TTS is not enabled" }
         end
         
-        # Skip if TTS service URL is not configured
-        if @tts_service_url.blank?
+        # Skip if provider-specific settings are not configured
+        if @tts_provider == "openai" && @openai_api_key.blank?
+          return { success: false, error: "OpenAI API key is not configured" }
+        elsif @tts_provider == "custom" && @tts_service_url.blank?
           return { success: false, error: "TTS service URL is not configured" }
         end
         
@@ -39,9 +48,9 @@ module ExpertDialog
         
         dialog_parts.each do |part|
           # Generate audio for this part
-          audio_data = generate_audio_for_part(part[:speaker], part[:text])
+          audio_result = generate_audio_for_part(part[:speaker], part[:text])
           
-          if audio_data
+          if audio_result[:success]
             filename = "dialog_part_#{part[:index]}.mp3"
             path = "#{Rails.root}/public/uploads/expert_dialog/#{filename}"
             
@@ -50,7 +59,7 @@ module ExpertDialog
             
             # Write audio data to file
             File.open(path, 'wb') do |file|
-              file.write(audio_data)
+              file.write(audio_result[:audio_data])
             end
             
             audio_files << {
@@ -59,6 +68,8 @@ module ExpertDialog
               speaker: part[:speaker],
               index: part[:index]
             }
+          else
+            Rails.logger.error("Failed to generate audio for part #{part[:index]}: #{audio_result[:error]}")
           end
         end
         
@@ -94,8 +105,8 @@ module ExpertDialog
         # Determine which expert this is
         expert_key = speaker_name.include?("Phillips") ? "expert1" : "expert2"
         
-        # Split long text into manageable chunks (3000 chars max)
-        text_chunks = chunk_text(speaker_text, 3000)
+        # Split long text into manageable chunks (4000 chars max for OpenAI TTS)
+        text_chunks = chunk_text(speaker_text, 4000)
         
         text_chunks.each do |chunk|
           parts << {
@@ -146,30 +157,71 @@ module ExpertDialog
       voice = @voice_profiles[speaker_key]
       
       begin
-        # Call TTS service (this is a simplified example)
-        uri = URI.parse("#{@tts_service_url}/generate")
-        request = Net::HTTP::Post.new(uri)
-        request["Content-Type"] = "application/json"
-        request.body = {
-          text: text,
-          voice: voice,
-          format: "mp3"
-        }.to_json
-        
-        response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == "https") do |http|
-          http.request(request)
-        end
-        
-        if response.code == "200"
-          # Return the binary audio data
-          response.body
+        if @tts_provider == "openai"
+          generate_audio_with_openai(text, voice)
         else
-          Rails.logger.error("TTS generation failed: #{response.body}")
-          nil
+          generate_audio_with_custom_service(text, voice)
         end
       rescue => e
-        Rails.logger.error("TTS service error: #{e.message}")
-        nil
+        Rails.logger.error("TTS generation error: #{e.message}")
+        { success: false, error: e.message }
+      end
+    end
+    
+    def generate_audio_with_openai(text, voice)
+      # Call OpenAI TTS API
+      uri = URI.parse("https://api.openai.com/v1/audio/speech")
+      request = Net::HTTP::Post.new(uri)
+      request["Content-Type"] = "application/json"
+      request["Authorization"] = "Bearer #{@openai_api_key}"
+      request.body = {
+        model: @tts_model,
+        voice: voice,
+        input: text,
+        response_format: "mp3"
+      }.to_json
+      
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+        http.request(request)
+      end
+      
+      if response.code == "200"
+        { success: true, audio_data: response.body }
+      else
+        error_message = "OpenAI TTS API error: #{response.code}"
+        begin
+          error_data = JSON.parse(response.body)
+          error_message = "OpenAI TTS API error: #{error_data['error']['message']}"
+        rescue
+          # Use the default error message if we can't parse the response
+        end
+        
+        Rails.logger.error(error_message)
+        { success: false, error: error_message }
+      end
+    end
+    
+    def generate_audio_with_custom_service(text, voice)
+      # Call custom TTS service
+      uri = URI.parse("#{@tts_service_url}/generate")
+      request = Net::HTTP::Post.new(uri)
+      request["Content-Type"] = "application/json"
+      request.body = {
+        text: text,
+        voice: voice,
+        format: "mp3"
+      }.to_json
+      
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: uri.scheme == "https") do |http|
+        http.request(request)
+      end
+      
+      if response.code == "200"
+        { success: true, audio_data: response.body }
+      else
+        error_message = "Custom TTS service error: #{response.code}"
+        Rails.logger.error(error_message)
+        { success: false, error: error_message }
       end
     end
     
@@ -189,9 +241,26 @@ module ExpertDialog
         file_paths = ordered_files.map { |f| f[:path] }.join(" ")
         
         # Use system command to combine files
-        # This is a placeholder - actual implementation depends on available tools
+        # This assumes ffmpeg is installed on the server
         # You might need to customize this based on your server environment
-        system("cat #{file_paths} > #{combined_path}")
+        if system("which ffmpeg > /dev/null 2>&1")
+          # Create file list for ffmpeg
+          list_file = "#{Rails.root}/tmp/ffmpeg_list_#{timestamp}.txt"
+          File.open(list_file, "w") do |f|
+            ordered_files.each do |audio|
+              f.puts "file '#{audio[:path]}'"
+            end
+          end
+          
+          # Use ffmpeg to concatenate the files
+          system("ffmpeg -f concat -safe 0 -i #{list_file} -c copy #{combined_path}")
+          
+          # Clean up the list file
+          File.delete(list_file) if File.exist?(list_file)
+        else
+          # Fallback to simple concatenation
+          system("cat #{file_paths} > #{combined_path}")
+        end
         
         # Return the URL for the combined file
         "/uploads/expert_dialog/#{combined_filename}"

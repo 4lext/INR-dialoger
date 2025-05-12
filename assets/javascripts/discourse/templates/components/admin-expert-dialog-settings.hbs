@@ -1,0 +1,150 @@
+{{#if this.currentUser.admin}}
+  <h3>{{i18n "expert_dialog.admin_title"}}</h3>
+  
+  <form class="form-horizontal expert-dialog-settings">
+    <div class="control-group">
+      <label class="control-label">{{i18n "expert_dialog.settings.claude_model"}}</label>
+      <div class="controls">
+        {{combo-box
+          content=this.claudeModels
+          value=this.siteSettings.expert_dialog_claude_model
+          onChange=(action "updateSetting" "expert_dialog_claude_model")
+        }}
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label">{{i18n "expert_dialog.settings.temperature"}}</label>
+      <div class="controls">
+        {{input
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value=this.siteSettings.expert_dialog_temperature
+          change=(action "updateSetting" "expert_dialog_temperature" value="target.value")
+        }}
+        <span class="value">{{this.siteSettings.expert_dialog_temperature}}</span>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label">{{i18n "expert_dialog.settings.max_length"}}</label>
+      <div class="controls">
+        {{input
+          type="number"
+          value=this.siteSettings.expert_dialog_max_length
+          change=(action "updateSetting" "expert_dialog_max_length" value="target.value")
+        }}
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label">{{i18n "expert_dialog.settings.publish_method"}}</label>
+      <div class="controls">
+        {{combo-box
+          content=this.publishMethods
+          value=this.siteSettings.expert_dialog_publish_method
+          onChange=(action "updateSetting" "expert_dialog_publish_method")
+        }}
+      </div>
+    </div>
+
+    <h4>{{i18n "expert_dialog.settings.tts_settings"}}</h4>
+
+    <div class="control-group">
+      <label class="control-label">{{i18n "expert_dialog.settings.enable_tts"}}</label>
+      <div class="controls">
+        {{input
+          type="checkbox"
+          checked=this.siteSettings.expert_dialog_enable_tts
+          change=(action "updateSetting" "expert_dialog_enable_tts" value="target.checked")
+        }}
+      </div>
+    </div>
+
+    {{#if this.siteSettings.expert_dialog_enable_tts}}
+      <div class="control-group">
+        <label class="control-label">{{i18n "expert_dialog.settings.tts_provider"}}</label>
+        <div class="controls">
+          {{combo-box
+            content=this.ttsProviders
+            value=this.siteSettings.expert_dialog_tts_provider
+            onChange=(action "updateSetting" "expert_dialog_tts_provider")
+          }}
+        </div>
+      </div>
+
+      {{#if this.isOpenAIProvider}}
+        <div class="control-group">
+          <label class="control-label">{{i18n "expert_dialog.settings.tts_model"}}</label>
+          <div class="controls">
+            {{combo-box
+              content=this.ttsModels
+              value=this.siteSettings.expert_dialog_tts_model
+              onChange=(action "updateSetting" "expert_dialog_tts_model")
+            }}
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">{{i18n "expert_dialog.settings.openai_api_key"}}</label>
+          <div class="controls">
+            {{input
+              type="password"
+              value=this.siteSettings.expert_dialog_openai_api_key
+              placeholder=(i18n "expert_dialog.settings.api_key_placeholder")
+              change=(action "updateSetting" "expert_dialog_openai_api_key" value="target.value")
+            }}
+          </div>
+        </div>
+      {{/if}}
+
+      {{#if this.isCustomProvider}}
+        <div class="control-group">
+          <label class="control-label">{{i18n "expert_dialog.settings.tts_service_url"}}</label>
+          <div class="controls">
+            {{input
+              type="text"
+              value=this.siteSettings.expert_dialog_tts_service_url
+              placeholder=(i18n "expert_dialog.settings.service_url_placeholder")
+              change=(action "updateSetting" "expert_dialog_tts_service_url" value="target.value")
+            }}
+          </div>
+        </div>
+      {{/if}}
+
+      <div class="control-group">
+        <label class="control-label">{{i18n "expert_dialog.settings.tts_voice_1"}}</label>
+        <div class="controls">
+          {{combo-box
+            content=this.ttsVoices
+            value=this.siteSettings.expert_dialog_tts_voice_1
+            onChange=(action "updateSetting" "expert_dialog_tts_voice_1")
+          }}
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">{{i18n "expert_dialog.settings.tts_voice_2"}}</label>
+        <div class="controls">
+          {{combo-box
+            content=this.ttsVoices
+            value=this.siteSettings.expert_dialog_tts_voice_2
+            onChange=(action "updateSetting" "expert_dialog_tts_voice_2")
+          }}
+        </div>
+      </div>
+    {{/if}}
+
+    <div class="control-group">
+      <div class="controls">
+        <button class="btn btn-primary" {{action "saveSettings"}}>
+          {{i18n "expert_dialog.settings.save"}}
+        </button>
+      </div>
+    </div>
+  </form>
+{{else}}
+  <p>{{i18n "expert_dialog.admin_only"}}</p>
+{{/if}} 

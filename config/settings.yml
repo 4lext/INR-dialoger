@@ -6,7 +6,7 @@ plugins:
     default: ""
     client: false
   expert_dialog_claude_model:
-    default: "claude-3-opus-20240229"
+    default: "claude-3-5-sonnet-20241022"
     client: true
   expert_dialog_temperature:
     default: 0.7
@@ -23,12 +23,41 @@ plugins:
   expert_dialog_enable_tts:
     default: false
     client: true
+  expert_dialog_tts_provider:
+    default: "openai"
+    client: true
+    choices:
+      - "openai"
+      - "custom"
   expert_dialog_tts_service_url:
     default: ""
     client: false
-  expert_dialog_tts_voice_1:
-    default: "female_voice_1"
+  expert_dialog_openai_api_key:
+    default: ""
+    client: false
+  expert_dialog_tts_model:
+    default: "tts-1"
     client: true
+    choices:
+      - "tts-1"
+      - "tts-1-hd"
+  expert_dialog_tts_voice_1:
+    default: "alloy"
+    client: true
+    choices:
+      - "alloy"
+      - "echo"
+      - "fable"
+      - "onyx"
+      - "nova"
+      - "shimmer"
   expert_dialog_tts_voice_2:
-    default: "male_voice_1"
-    client: true 
+    default: "onyx"
+    client: true
+    choices:
+      - "alloy"
+      - "echo"
+      - "fable"
+      - "onyx"
+      - "nova"
+      - "shimmer" 
