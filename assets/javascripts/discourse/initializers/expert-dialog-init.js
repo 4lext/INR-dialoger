@@ -1,4 +1,5 @@
 import { apiInitializer } from "discourse/lib/api";
+import { computed } from "@ember/object";
 import TopicAdminMenuButton from "../components/topic-admin-menu-button";
 
 export default apiInitializer("0.11.1", api => {
@@ -9,14 +10,14 @@ export default apiInitializer("0.11.1", api => {
   api.modifyClass("model:topic", {
     pluginId: "discourse-expert-dialog",
     
-    can_generate_expert_dialog: function() {
+    can_generate_expert_dialog: computed("currentUser.staff", function() {
       const siteSettings = api.container.lookup("service:site-settings");
       const currentUser = api.getCurrentUser();
       
       return siteSettings.expert_dialog_enabled && 
              currentUser && 
              currentUser.staff;
-    }.property("currentUser.staff")
+    })
   });
   
   // Add dialog service

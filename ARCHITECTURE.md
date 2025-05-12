@@ -162,4 +162,49 @@ The plugin integrates with Discourse 3.5+ through:
 2. **API Initialization**: Using `apiInitializer` with version compatibility
 3. **Model Extensions**: Using `api.modifyClass()` to extend core models
 4. **Widget Decoration**: Using `api.decorateWidget()` for post modifications
-5. **Connectors**: Traditional connector pattern for specific integration points 
+5. **Connectors**: Traditional connector pattern for specific integration points
+
+## Discourse 3.5+ Compatibility Details
+
+To ensure compatibility with Discourse 3.5+, the plugin implements several modern patterns:
+
+### 1. Modern Component Structure
+
+All components follow the Glimmer component pattern:
+- Classes that extend `@glimmer/component`
+- Props accessed via `this.args`
+- Services injected with `@service` decorator
+- Actions defined with `@action` decorator
+- State managed with `@tracked` properties
+
+### 2. Connector Updates
+
+Connectors use the modern pattern:
+- Component classes instead of simple objects
+- Args accessed via `this.args.outletArgs`
+- Conditional logic in computed properties
+- Proper owner injection for service access
+
+### 3. Modal Dialogs
+
+The plugin uses Discourse's native modal service instead of third-party libraries:
+- `this.modal.show()` instead of `bootbox`
+- Proper button configuration
+- Loading state management
+- Error handling
+
+### 4. Initializer API
+
+The initializer uses the modern API pattern:
+- `apiInitializer` with version specification
+- Proper usage of `api.renderInOutlet()`
+- Proper class modification with `api.modifyClass()`
+
+### 5. CSS Updates
+
+The plugin uses CSS custom properties for better theming compatibility:
+- Uses Discourse variables for colors and spacing
+- Respects dark mode
+- Follows Discourse's responsive design patterns
+
+These updates ensure the plugin works properly with Discourse 3.5+ while maintaining backward compatibility with earlier versions where possible. 

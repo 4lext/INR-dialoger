@@ -116,6 +116,26 @@ The plugin uses a hybrid approach for UI integration with Discourse:
    
 This hybrid approach ensures compatibility with Discourse 3.5+ while maintaining proper integration with different parts of the UI.
 
+## Debugging and Troubleshooting
+
+When encountering issues with the plugin, especially after Discourse updates, check these common areas:
+
+1. **Template Syntax**: Discourse 3.5+ requires modern Handlebars syntax with `this.args` in connector templates
+2. **Component Structure**: Ensure all components use the Glimmer component pattern
+3. **Dialog Service**: Check that the service is properly registered in the initializer
+4. **Browser Console**: Look for JavaScript errors in the browser console
+5. **Discourse Logs**: Check Rails logs for server-side errors related to the plugin
+6. **API Responses**: Check network traffic for responses from the Claude and TTS APIs
+
+To enable development mode for more detailed logging:
+
+```
+cd /var/discourse
+./launcher enter app
+cd /var/www/discourse
+DISCOURSE_DEV=1 bin/rails s
+```
+
 ## Requirements
 
 - Discourse v3.5.0 or higher
