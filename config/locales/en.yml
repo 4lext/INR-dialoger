@@ -1,0 +1,21 @@
+en:
+  site_settings:
+    expert_dialog_enabled: "Enable Expert Dialog Plugin"
+    expert_dialog_claude_api_key: "Claude API Key"
+    expert_dialog_claude_model: "Claude Model"
+    expert_dialog_temperature: "Dialog Generation Temperature (0.0-1.0)"
+    expert_dialog_max_length: "Maximum Dialog Length (words)"
+    expert_dialog_publish_method: "Dialog Publishing Method"
+    expert_dialog_enable_tts: "Enable Text-to-Speech for Dialogs"
+    expert_dialog_tts_service_url: "TTS Service URL"
+    expert_dialog_tts_voice_1: "Voice for Expert 1"
+    expert_dialog_tts_voice_2: "Voice for Expert 2"
+  
+  expert_dialog:
+    title: "Expert Dialog"
+    generate_button: "Generate Expert Dialog"
+    generating: "Generating dialog..."
+    success: "Dialog generated successfully!"
+    error: "Error generating dialog"
+    listen: "Listen to Dialog"
+    download_audio: "Download Audio" 

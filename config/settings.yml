@@ -1,0 +1,34 @@
+plugins:
+  expert_dialog_enabled:
+    default: true
+    client: true
+  expert_dialog_claude_api_key:
+    default: ""
+    client: false
+  expert_dialog_claude_model:
+    default: "claude-3-opus-20240229"
+    client: true
+  expert_dialog_temperature:
+    default: 0.7
+    client: true
+  expert_dialog_max_length:
+    default: 1200
+    client: true
+  expert_dialog_publish_method:
+    default: "reply"
+    client: true
+    choices:
+      - "reply"
+      - "edit_topic"
+  expert_dialog_enable_tts:
+    default: false
+    client: true
+  expert_dialog_tts_service_url:
+    default: ""
+    client: false
+  expert_dialog_tts_voice_1:
+    default: "female_voice_1"
+    client: true
+  expert_dialog_tts_voice_2:
+    default: "male_voice_1"
+    client: true 

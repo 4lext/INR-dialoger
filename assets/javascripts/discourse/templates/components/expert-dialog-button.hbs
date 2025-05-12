@@ -1,0 +1,9 @@
+{{#if this.isGenerating}}
+  <span class="expert-dialog-working">{{this.workingMessage}}</span>
+{{else}}
+  <span onclick={{action "generateDialog"}}>{{i18n "expert_dialog.generate_button"}}</span>
+{{/if}}
+
+{{#if this.errorMessage}}
+  <div class="alert alert-error">{{this.errorMessage}}</div>
+{{/if}} 
